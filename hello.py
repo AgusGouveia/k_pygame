@@ -10,7 +10,6 @@ pantalla = pg.display.set_mode((600, 400)) #Creacion de la pantalla
 pg.display.set_caption("Hola")
 
 game_over = False
-
 while not game_over:
     #Gestion de eventos
     for evento in pg.event.get():

@@ -1,6 +1,20 @@
 import pygame as pg
 import sys
-from random import randint, choice
+from random import randint
+
+def rebotaX(x):
+    if x <=0 or x >=ANCHO:
+        return -1
+
+    return 1
+
+def rebotaY(y):
+    if y <=0 or y >=ALTO:
+        return -1
+
+    return 1
+
+
 
 ROJO = (255, 0, 0)
 AZUL = (0, 0, 255)
@@ -14,34 +28,27 @@ pantalla = pg.display.set_mode((ANCHO, ALTO)) #Creacion de la pantalla
 reloj = pg.time.Clock() # Controlador de FPS
 
 class Bola():
-    def __init__(self, x, y, vx=5, vy=5, color=(255, 255, 255), radio=10):
+    def __init__(self, x, y, vx, vy, color):
         self.x = x
         self.y = y
         self.vx = vx
         self.vy = vy
         self.color = color
-        self.radio = radio
 
-    def actualizar(self): #Al colocar los self le quitaron grado de libertad al usuario
-        self.x += self.vx
-        self.y += self.vy
-
-        if self.y <=0 or self.y >=ALTO:
-            self.vy = -self.vy
-
-        if self.x <=0 or self.x >=ANCHO:
-            self.vx = -self.vx
-
-    def dibujar(self, lienzo):
-        pg.draw.circle(lienzo, self.color, (self.x, self.y), self.radio )
-
+    def randdir():
+        x = randint(0,1)
+        if x == 0:
+            y = randint(-10, -5)
+        else:
+            y = randint(5, 10)
+        return y
 
 bolas = []
-for _ in range(10): #Crear 10 bolas con valores randoms (randint)
+for _ in range(20): #Crear 10 bolas con valores randoms (randint)
     bola = Bola(randint(0, ANCHO),
                 randint(0, ALTO),
-                randint(5, 10),
-                randint(5, 10),
+                Bola.randdir(),
+                Bola.randdir(),
                 (randint(0, 255), randint(0,255), randint(0,255)))
 
     bolas.append(bola)
@@ -56,13 +63,17 @@ while not game_over:
 
     # Modificación de estado
     for bola in bolas:
-        bola.actualizar()
+        bola.x += bola.vx
+        bola.y += bola.vy
+
+        bola.vy *= rebotaY(bola.y)
+        bola.vx *= rebotaX(bola.x)
 
 
     # Gestión de la pantalla
     pantalla.fill(NEGRO) #Recolocar pantalla
     for bola in bolas:
-        bola.dibujar(pantalla)
+        pg.draw.circle(pantalla, bola.color, (bola.x, bola.y), 10) #Creacion de la bola
 
 
     pg.display.flip() #Refrescar pantalla
