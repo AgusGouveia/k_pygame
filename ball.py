@@ -118,7 +118,9 @@ while not game_over and vidas > 0:
         bola.dibujar(pantalla)
         raqueta.dibujar(pantalla)
     pg.display.flip()
-    
+
 pg.time.delay(1000)
 pg.quit()
 sys.exit()
+
+#Falta acomodar textos y darle estructura a esta cosa.
