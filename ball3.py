@@ -14,7 +14,7 @@ pantalla = pg.display.set_mode((ANCHO, ALTO))
 reloj = pg.time.Clock()
 
 fuenteSys = pg.font.SysFont("segoe print", 30)
-textoSys = fuenteSys.render("Vidas: {}", True, VERDE).format(vidas)
+textoSys = fuenteSys.render("Vidas: ", True, VERDE)
 
 class Bola():
     def __init__(self, x, y, vx=5, vy=5, color= (255, 255, 255), radio=10):
