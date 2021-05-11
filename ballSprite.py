@@ -7,11 +7,19 @@ ANCHO = 800
 ALTO = 600
 FPS = 60
 
-levels = { ['XXXXXXXX', 
-          'X--DD--X', 
-          'X--DD--X', 
-          'XXXXXXXX',
-          '---DD---'
+levels = [  ['---X----'],
+            [ 'XXXXXXXX', 
+                'X--DD--X',
+                'X--DD--X',
+                'XXXXXXXX',
+                '---DD---'
+          ],
+            [ 'DDDDDDDD',
+                'DDDDDDDD',
+                'DDDDDDDD',
+                'DDDDDDDD'  
+          ]
+]
 
 
 
@@ -71,11 +79,11 @@ class CuentaVidas(MarcadorH):
 class Ladrillo(pg.sprite.Sprite):
     disfraces = ['greenTile.png', 'redTile.png', 'redTileBreak.png'] #Dejamos listas las imagenes para luego utilizarlas
 
-    def __init__(self, x, y, esDuro=False):
+    def __init__(self, x, y, esBlando=True):
         super().__init__()
         self.imagenes = self.cargaImagenes()
-        self.esDuro = esDuro #Inicializado a False, por lo que será un ladrillo verde(uno normal)
-        self.imagen_actual = 1 if self.esDuro else 0 #si es 1 es duro, sino, 0. Es otra manera de escribir el If -> Operador ternario
+        self.esBlando = esBlando #Inicializado a True, por lo que será un ladrillo verde(uno normal)
+        self.imagen_actual = 0 if self.esBlando else 1 #si es 0 es duro, sino, 1. Es otra manera de escribir el If -> Operador ternario
         self.image = self.imagenes[self.imagen_actual] #Asignamos nuestra imagenes a una variable y jugamos con el indice de la lista
         self.rect = self.image.get_rect(topleft=(x,y)) #Creamos un rectangulo que utilizaria nuestra variable Image
         self.numGolpes = 0 #Iniciamos los ladrillos nuevos, en 0, sin golpes.
@@ -87,13 +95,13 @@ class Ladrillo(pg.sprite.Sprite):
         return imagenes
 
     def update(self, dt):
-        if self.esDuro and self.numGolpes == 1:
+        if self.esBlando == False and self.numGolpes == 1:
             self.imagen_actual = 2
             self.image = self.imagenes[self.imagen_actual]
 
     def desaparece(self):
         self.numGolpes += 1
-        return (self.numGolpes > 0 and not self.esDuro) or (self.numGolpes > 1 and self.esDuro)
+        return (self.numGolpes > 0 and self.esBlando) or (self.numGolpes > 1 and not self.esBlando)
 
 class Raqueta(pg.sprite.Sprite):
     disfraces = ['electric00.png', 'electric01.png', 'electric02.png']
@@ -207,8 +215,9 @@ class Game():
         self.todoGrupo = pg.sprite.Group()
         self.grupoJugador = pg.sprite.Group()
         self.grupoLadrillos = pg.sprite.Group()
+        self.level= 0
 
-        self.disponer_ladrillos(levels['level1']) #Llamamos a la funcion y seleccionamos el level
+        self.disponer_ladrillos(levels[self.level]) #Llamamos a la funcion y le colocamos la lista de levels
 
         self.cuentaPuntos = MarcadorH(10,10, fontsize=50)
         self.cuentaVidas = CuentaVidas(790, 10, "topright", 50, (255, 255, 0))
@@ -225,22 +234,13 @@ class Game():
 
     
     def disponer_ladrillos(self, level):
-        level1 = ['XXXXXXXX', 'X--DD--X', 'X--DD--X', 'XXXXXXXX']
-        for fila in range(len(level1)):
-            contador = 0
-            for caracter in level[fila]:
-                if caracter == 'X':
-                    x = 5 + (100 * contador)
+        for fila, cadena in enumerate(level):
+            for columna, caracter in enumerate(cadena):
+                if caracter in 'DX':
+                    x = 5 + (100 * columna)
                     y = 5 + (40 * fila)
-                    ladrillo = Ladrillo(x, y)
+                    ladrillo = Ladrillo(x, y, caracter == 'X')
                     self.grupoLadrillos.add(ladrillo)
-                elif caracter == 'D':
-                    x = 5 + (100 * contador)
-                    y = 5 + (40 * fila)
-                    esDuro = True 
-                    ladrillo = Ladrillo(x, y, esDuro)
-                    self.grupoLadrillos.add(ladrillo)
-                contador += 1 
 
     def bucle_principal(self):
         game_over = False
@@ -261,6 +261,10 @@ class Game():
                 if ladrillo.desaparece(): #Si la funcion nos devuelve True...
                     self.grupoLadrillos.remove(ladrillo) #Eliminamos el ladrillo correspondiente 
                     self.todoGrupo.remove(ladrillo) #Quitamos el ladrillo del grupo
+                    if len(self.grupoLadrillos) == 0: #Cuando hayan sido eliminados todos los ladrillos, pasamos de nivel
+                        self.level += 1
+                        self.disponer_ladrillos(levels[self.level])
+                        self.todoGrupo.add(self.grupoLadrillos)
 
             self.todoGrupo.update(dt)
             if self.bola.estado == Bola.Estado.muerta:

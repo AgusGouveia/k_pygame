@@ -222,19 +222,23 @@ class Game():
         self.todoGrupo.add(self.cuentaPuntos, self.cuentaVidas)
 
     def disponer_ladrillos(self):
-        self.level1 = ['XXXXXXXX',
-                       'X--DD--X',
-                       'X--DD--X',
-                       'XXXXXXXX']
+        level1 = [(1,1,1,1,1,1,1,1),
+                  (1,0,0,2,2,0,0,1),
+                  (1,0,0,2,2,0,0,1),
+                  (1,1,1,1,1,1,1,1)]
 
-        - = sin ladrillo
-        X = ladrillo normal
-        D = self.esDuro
-
-        for filas in range(4):
-            for columnas in range(8):
-
-
+        
+        
+        esDuro = False cuando el elemento de la lista sea 1
+        esDuro = True cuando el elemento de la lista sea 2
+        
+        
+        for fila in range(len(level1)):
+            for columna in range(len(level1[1])):
+                x = columna * 100 + 5 
+                y = fila * 40 + 5
+                esDuro = level1
+                ladrillo = Ladrillo(x, y, esDuro)
 
     def bucle_principal(self):
         game_over = False
